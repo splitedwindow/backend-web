@@ -186,10 +186,7 @@ router.get("/links", async (req, res) => {
       });
 
       return res.status(200).send(expiredAtLinks);
-    } else if(!booleanGt && !! )
-    {
-      
-    }
+    } 
   }
 
 
