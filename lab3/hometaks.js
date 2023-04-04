@@ -53,8 +53,6 @@ let replicas = [];
     }
   }
 
-  let array = [];
-  let result = Object.keys(Object.keys(res)).map((i) => Number(i));
 
   array_of_names = [];
   count_of_names = 0;
@@ -66,9 +64,6 @@ let replicas = [];
     count_of_names++;
     array_of_names[i] = current_name;
   }
-
-
-  let name = array_of_names[0];
   
 
   for (let i = 0; i < count_of_names; i++) {
