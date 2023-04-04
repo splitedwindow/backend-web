@@ -11,11 +11,6 @@ const router = Router();
 router.post("/links", async (req, res) => {
   const { originalLink } = req.body;
   const { authorization } = req.headers;
-
-  const {
-    expiredAt,
-  } = req.query;
-
   
   
   let apiKey = authorization;
@@ -28,49 +23,6 @@ router.post("/links", async (req, res) => {
       message: "User is not authorized",
     });
   }
-
-  if(expiredAt)
-  {
-    if(expiredAt.gt && expiredAt.ls){ // ls and gt
-
-      let greaterThanDate = Date.parse(expiredAt.gt);
-      let lessThanDate = Date.parse(expiredAt.lt);
-
-      let expiredAtLinks = Links.find({ //query today up to tonight
-        expiredAt: {
-          $gt: greaterThanDate, 
-          $lt: lessThanDate
-        }
-      });
-
-      return res.status(200).send(expiredAtLinks);
-
-    } else if (expiredAt.gt && !expiredAt.lt) // gt only
-    {
-      let greaterThanDate = Date.parse(expiredAt.gt);
-
-      let expiredAtLinks = Links.find({ //query today up to tonight
-        expiredAt: {
-          $gt: greaterThanDate, 
-        }
-      });
-
-      return res.status(200).send(expiredAtLinks);
-
-    } else if (!expiredAt.gt && expiredAt.lt) // ls only
-    {
-      let lessThanDate = Date.parse(expiredAt.lt);
-
-      let expiredAtLinks = Links.find({ //query today up to tonight
-        expiredAt: {
-          $lt: lessThanDate
-        }
-      });
-
-      return res.status(200).send(expiredAtLinks);
-    } 
-  }
-
   
   
   console.log(`find user: ${findUser._id}`);
@@ -138,7 +90,6 @@ router.post("/links", async (req, res) => {
 });
 
 
-
 const characters =
   "abcdefghijklmnopqrstuvwxyz" +
   "abcdefghijklmnopqrstuvwxyz".toUpperCase() +
@@ -157,13 +108,11 @@ function createShortLink() {
   }
 
   return generate_short_link;
-
 }
 
 router.get("/links", async (req, res) => {
   const { authorization } = req.headers;
 
-  
   let {
     expiredAt,
   } = req.query;
@@ -179,8 +128,17 @@ router.get("/links", async (req, res) => {
     });
   }
 
-  
-  if(expiredAt)
+  let user_ID = findUser.userId
+
+
+  if(!expiredAt) // return all links user has
+  {
+    let user_links = await Links.find({
+      user_ID,
+    })
+
+    return res.status(200).send(user_links);
+  } else
   {
     let jsonExpiredAt = JSON.parse(expiredAt);
 
@@ -192,11 +150,13 @@ router.get("/links", async (req, res) => {
       let greaterThanDate = Date.parse(jsonExpiredAt.gt);
       let lessThanDate = Date.parse(jsonExpiredAt.lt);
 
-      let expiredAtLinks = await Links.find({ //query today up to tonight
+      let expiredAtLinks = await Links.find({ 
         expiredAt: {
           $gt: greaterThanDate, 
           $lt: lessThanDate
-        }
+        },
+        user_ID
+
       });
 
       return res.status(200).send(expiredAtLinks);
@@ -205,10 +165,11 @@ router.get("/links", async (req, res) => {
     {
       let greaterThanDate = Date.parse(jsonExpiredAt.gt);
 
-      let expiredAtLinks = await Links.find({ //query today up to tonight
+      let expiredAtLinks = await Links.find({ 
         expiredAt: {
           $gt: greaterThanDate, 
-        }
+        },
+        user_ID
       });
 
       return res.status(200).send(expiredAtLinks);
@@ -220,11 +181,15 @@ router.get("/links", async (req, res) => {
       let expiredAtLinks = await Links.find({ //query today up to tonight
         expiredAt: {
           $lt: lessThanDate
-        }
+        },
+        user_ID
       });
 
       return res.status(200).send(expiredAtLinks);
-    } 
+    } else if(!booleanGt && !! )
+    {
+      
+    }
   }
 
 
@@ -257,9 +222,6 @@ router.get('/shortLink/:cut', async (req, res) => {
         message: 'Link is expired',
       })
     }
-
-
-
 
     return res.redirect(doc.links.original);
   } else 

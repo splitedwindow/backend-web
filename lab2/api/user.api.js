@@ -39,6 +39,7 @@ router.post('/users/login', async (req, res) => {
   const { email, password} = req.body;
   console.log(req.body)
 
+  // check 
 
   const findUser = await Users.findOne({email, password});
   if(findUser){
@@ -46,12 +47,12 @@ router.post('/users/login', async (req, res) => {
     return res.status(200).send({
       findUser
     });
-  } else 
-  {
-    return res.status(400).send({
-      message: "Wrong email or password"
-    })
-  }
+  } 
+  
+  return res.status(400).send({
+    message: "Wrong email or password"
+  })
+  
 });
 
 module.exports = { router };
